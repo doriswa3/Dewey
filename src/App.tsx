@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import About from "./pages/About";
 import Join from "./pages/Join";
 import NotFound from "./pages/NotFound";
+import SearchPage from "./pages/SearchPage";
 
 const queryClient = new QueryClient();
 import { useRatingContext } from "@/components/contexts/RatingContext";
@@ -61,6 +62,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/searchpage" element={<SearchPage />} />
           <Route path="/feed" element={<Feed />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/about" element={<About />} />

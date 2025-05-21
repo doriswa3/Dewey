@@ -19,7 +19,7 @@ const Profile = () => {
       .filter((r) => r.category === category)
       .sort((a, b) => a.position - b.position);
 
-    topBooks.push(...sorted); // don't limit here
+    topBooks.push(...sorted);
   });
 
   const displayedBooks = showAllTopBooks ? topBooks : topBooks.slice(0, 5);
@@ -292,6 +292,7 @@ const Profile = () => {
               
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
                     {displayedBooks.map((rating, index) => (
+                      console.log(rating),
                       <div key={rating.book.id} className="relative">
                         <span className="absolute -top-2 -left-2 bg-dewey-green text-white text-xs px-2 py-1 rounded-full z-10">
                           #{index + 1}
@@ -302,6 +303,8 @@ const Profile = () => {
                           title={rating.book.title}
                           author={rating.book.author}
                           rating={rating.position}
+                          stars={rating.book.stars} 
+                          review={rating.book.review || "No review available"} // Default message
                           liked={false}
                           isOnShelf={isOnShelf(rating.book.title)}
                           onToggleShelf={() =>
