@@ -11,6 +11,7 @@ import About from "./pages/About";
 import Join from "./pages/Join";
 import NotFound from "./pages/NotFound";
 import SearchPage from "./pages/SearchPage";
+import { FeedProvider } from "./components/contexts/FeedContext";
 
 const queryClient = new QueryClient();
 import { useRatingContext } from "@/components/contexts/RatingContext";
@@ -60,6 +61,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <FeedProvider>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/searchpage" element={<SearchPage />} />
@@ -71,6 +73,7 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
         <TieBreakerPopup />
+      </FeedProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Heart, Star } from "lucide-react";
 import { useRatingContext } from "./contexts/RatingContext";
+import { useFeedContext } from "./contexts/FeedContext";
 interface BookCardProps {
   id: string;
   cover: string;
@@ -15,14 +16,15 @@ interface BookCardProps {
 }
 
 const BookCard = ({ id, cover, title, author, isOnShelf = false, onToggleShelf }: BookCardProps) => {
-  const { handleRatingCategory, ratings, setStars } = useRatingContext();
+  const { handleRatingCategory, ratings, setStars, setReview } = useRatingContext();
   const isLiked = !!ratings[id] && ratings[id].category !== "dnf";
   const starsFromContext = ratings[id]?.stars ?? 0;
+  const reviewFromContext = ratings[id]?.review ?? "";
+  const [review, setReviewLocal] = useState(reviewFromContext);
   const [stars, setStarsLocal] = useState(starsFromContext);
   const [showCategoryPopup, setShowCategoryPopup] = useState(false);
-  const [review, setReview] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<"love" | "like" | "hate" | "dnf" | null>(null);
-
+  const { addFeedPost } = useFeedContext();
   const book = { id, title, author, cover };
 
   const handleHeartClick = () => {
@@ -31,18 +33,32 @@ const BookCard = ({ id, cover, title, author, isOnShelf = false, onToggleShelf }
     }
   };
 
+  const handlePostToFeed = () => {
+    addFeedPost({
+      username: "bookworm_emma", 
+      userImage: "https://i.pravatar.cc/300?img=5",
+      bookTitle: title,
+      bookAuthor: author,
+      bookCover: cover,
+      content: review,
+      rating: stars,
+      likes: 0,
+      comments: 0,
+      timestamp: new Date().toLocaleString(),
+    });
+    setShowCategoryPopup(false);
+  };
+
   const chooseCategory = (category: "love" | "like" | "hate" | "dnf") => {
     setSelectedCategory(category);
     handleRatingCategory(book, category);
   };
 
-  const handleStarClick = (star: number) => {
-    setStars(id, star);
-  };
 
   const handleReviewSubmit = () => {
     if (selectedCategory !== "dnf") {
-      setStars(id, stars); // ✅ Save stars globally
+      setStars(id, stars); 
+      setReview(id, review);
     }
     setShowCategoryPopup(false);
     setSelectedCategory(null);
@@ -77,14 +93,21 @@ const BookCard = ({ id, cover, title, author, isOnShelf = false, onToggleShelf }
       </div>
 
       <div className="flex items-center space-x-1 mb-4">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Star
-          key={star}
-          size={20}
-          className={`cursor-pointer ${starsFromContext >= star ? "text-yellow-500" : "text-gray-300"}`}
-        />
-      ))}
-    </div>
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+        key={star}
+        size={20}
+        className={`cursor-pointer ${starsFromContext >= star ? "text-yellow-500" : "text-gray-300"}`}
+          />
+        ))}
+      </div>
+      <div className="text-sm text-gray-600">
+        {review ? (
+          <p>{review}</p>
+        ) : (
+          <p className="italic text-gray-400">No review made yet.</p>
+        )}
+      </div>
 
 
       <button
@@ -143,24 +166,26 @@ const BookCard = ({ id, cover, title, author, isOnShelf = false, onToggleShelf }
                     key={star}
                     size={20}
                     className={`cursor-pointer ${stars >= star ? "text-yellow-500" : "text-gray-300"}`}
-                    onClick={() => setStarsLocal(star)} // ✅ updates local state before submitting
+                    onClick={() => setStarsLocal(star)} 
                     />
                   ))}
                   </div>
                 </div>
                 <textarea
                   value={review}
-                  onChange={(e) => setReview(e.target.value)}
+                  onChange={(e) => setReviewLocal(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg p-2 mb-4"
                   rows={4}
                   placeholder="Write your review here..."
                 />
                 <button
-                  onClick={handleReviewSubmit}
+                  onClick={() => { handleReviewSubmit(); handlePostToFeed(); }}
+
                   className="bg-dewey-green text-white rounded-lg px-4 py-2 font-medium hover:bg-dewey-green-dark transition-colors"
                 >
                   Submit
                 </button>
+              
               </>
             )}
           </div>
